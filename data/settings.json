@@ -1,0 +1,9 @@
+[
+	{
+		"save": "OVSRes-onrequest",
+		"name": "Display only when requested",
+		"type": "bool",
+		"description": "Makes the result screen display only when another mod requests it",
+		"value": true
+	}
+]

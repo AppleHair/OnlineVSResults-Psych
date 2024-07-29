@@ -1,0 +1,7 @@
+{
+	"name": "ONLINE VS. Result Screen",
+	"description": "The Result Screen from FNF ONLINE VS. ported to Psych Engine by AppleHair.",
+	"restart": true,
+	"runsGlobally": true,
+	"color": [213, 98, 225]
+}
