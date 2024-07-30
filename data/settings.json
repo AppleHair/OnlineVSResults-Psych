@@ -1,9 +1,9 @@
 [
 	{
-		"save": "OVSRes-onrequest",
-		"name": "Display only when requested",
+		"save": "OVSResults-trigger",
+		"name": "Only when triggered",
 		"type": "bool",
-		"description": "Makes the result screen display only when another mod requests it",
+		"description": "Makes the result screen display only when another mod triggers it using the `Signal-Trigger OVS Results` event.",
 		"value": true
 	}
 ]

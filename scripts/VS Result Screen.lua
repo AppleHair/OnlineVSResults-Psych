@@ -3,7 +3,8 @@
 ---@type boolean
 ResultScreenDebug = false;
 
-
+---@type boolean
+ResultScreenTrigger = false;
 
 function onCreate()
     addHaxeLibrary("CoolUtil", "backend");
@@ -17,8 +18,9 @@ function onCreate()
     addHaxeLibrary("LuaUtils", "psychlua");
     addHaxeLibrary("FlxSubState", "flixel");
     addHaxeLibrary("SScript", "tea");
-    -- onlinePlay = true | false
+
     RunningUMM = onlinePlay ~= nil;
+    -- onlinePlay = true | false
 end
 
 ---@type any
@@ -41,6 +43,8 @@ function onEvent(name, value1, value2)
         ]]);
     elseif name == "Signal-Set Unlocked Screen Color" then
         UnlockedColor = FlxColor(value1);
+    elseif name == "Signal-Trigger OVS Results" then
+        ResultScreenTrigger = true;
     end
 end
 
@@ -48,7 +52,9 @@ end
 ResultsShown = false;
 
 function onEndSong()
-    if RunningUMM or (isStoryMode and getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1) then
+    ResultScreenTrigger = ResultScreenTrigger or not getModSetting("OVSResults-trigger");
+    local inTheMiddleOfStory =  getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1 and isStoryMode;
+    if RunningUMM or inTheMiddleOfStory or not ResultScreenTrigger then
         return Function_Continue;
     end
     local substateName = "";

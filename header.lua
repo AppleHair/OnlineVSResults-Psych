@@ -1403,6 +1403,10 @@ function getSoundPitch(tag) end
 function insertToCustomSubstate(tag, pos) end
 ---Closes the current custom substate
 function closeCustomSubstate() end
+---Returns the value from a mod setting
+---@param saveTag string The save tag of the mod setting
+---@param modName? string The name of the mod you want to get the setting from
+function getModSetting(saveTag, modName) end
 
 --[[ DEPRECATED STUFF ]]--
 ---@deprecated
