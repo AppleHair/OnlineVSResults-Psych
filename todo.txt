@@ -1,0 +1,6 @@
+replace pack icon
+write the README
+get the repo ready and stuff
+make sure the Hank challenge port is also ready
+release the mod on GameBanana
+release the update to the Hank challenge port on GameBanana
