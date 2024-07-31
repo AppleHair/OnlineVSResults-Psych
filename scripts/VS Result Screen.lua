@@ -101,9 +101,22 @@ function onEndSong()
     return Function_Continue;
 end
 
+---@type table
+RatingMinMaxOffsetX = {-30, 30};
+---@type number
+RatingFinalOffsetX = 0;
+---@type table
+RatingMinMaxAngle = {-10, 10};
+---@type number
+RatingFinalAngle = 0;
+
 function onCustomSubstateCreate(name)
     if name == "ResultScreen" then
         SetupResultScreen();
+
+        math.randomseed(os.clock());
+        RatingFinalOffsetX = math.random(RatingMinMaxOffsetX[1], RatingMinMaxOffsetX[2]);
+        RatingFinalAngle = math.random(RatingMinMaxAngle[1], RatingMinMaxAngle[2]);
 
         makeLuaSprite('ResultFadeTransition', "", 0, 0);
         makeGraphic('ResultFadeTransition', screenWidth, screenHeight, "000000");
@@ -142,15 +155,16 @@ AccuracyCounter = (ResultScreenDebug and 0 or -10);
 ---@type table
 ResultScreenStates = {
 -- accuracy, rating, BGcolor, pitch, ratingAngle, ratingOffsetX, ratingOffsetY
-    {0, "shit", 0x6A4280, -0.35, 8, 3, -3},-- F
-    {16, "shit", 0x6A4280, -0.35, 0, 0, 0},-- E
-    {32, "bad", 0x6A4280, -0.225, 6, -4, -6},-- D
-    {47, "bad", 0x4648AA, -0.1, -4, -3, -4},-- C
-    {63, "good", 0x4648AA, 0.0, 3, 31, -6},-- B
-    {78, "good", 0xD562E1, 0.15, -7, 31, -6},-- A
-    {94, "sick", 0x7EF2BE, 0.25, 9, 58, 3},-- S
-    {100, "sick", 0x12E2E2, 0.3, 11, 58, 2},-- Ss
+    {0, "shit", 0x6A4280, -0.35},-- F
+    {16, "shit", 0x6A4280, -0.35},-- E
+    {32, "bad", 0x6A4280, -0.225},-- D
+    {47, "bad", 0x4648AA, -0.1},-- C
+    {63, "good", 0x4648AA, 0.0},-- B
+    {78, "good", 0xD562E1, 0.15},-- A
+    {94, "sick", 0x7EF2BE, 0.25},-- S
+    {100, "sick", 0x12E2E2, 0.3},-- Ss
 };
+---@type integer
 SickGoldColor = 0xfEffA4;
 
 ---@type table
@@ -208,12 +222,10 @@ function onCustomSubstateUpdate(name, elapsed)
     setProperty('ResultScreenBG.color', ResultScreenStates[ResultStateKey][3]);
     setProperty('ResultSmallS.alpha', (ResultStateKey == 8 and 1.0 or 0.00001));
     setProperty('ResultRating.color', (ResultStateKey == 8 and SickGoldColor or 0xFFFFFF));
-    setProperty('ResultRating.angle', ResultScreenStates[ResultStateKey][5]);
+    setProperty('ResultRating.angle', RatingFinalAngle);
     updateHitbox('ResultRating');
-    setProperty('ResultRating.offset.x', ResultScreenStates[ResultStateKey][6] +
-        getProperty('ResultRating.offset.x') * 0.1);
-    setProperty('ResultRating.offset.y', ResultScreenStates[ResultStateKey][7] +
-        getProperty('ResultRating.offset.y') * 0.1);
+    setProperty('ResultRating.offset.x', RatingFinalOffsetX + getProperty('ResultRating.offset.x') * 0.1);
+    setProperty('ResultRating.offset.y', getProperty('ResultRating.offset.y') * 0.1);
     screenCenter('ResultWhiteGradient', 'XY');
     setProperty('ResultWhiteGradient.x', getProperty('ResultWhiteGradient.x') +
         getProperty('ResultWhiteGradient.frameWidth') - getVar('ResultWhiteRevealed') - 162);
