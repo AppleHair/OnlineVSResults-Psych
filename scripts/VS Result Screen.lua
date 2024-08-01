@@ -7,6 +7,8 @@ ResultScreenDebug = false;
 ResultScreenTrigger = false;
 
 function onCreate()
+    addHaxeLibrary("WeekData", "backend");
+    addHaxeLibrary("Highscore", "backend");
     addHaxeLibrary("CoolUtil", "backend");
     addHaxeLibrary("CustomFadeTransition", "backend");
     addHaxeLibrary("FlxGradient", "flixel.util");
@@ -53,7 +55,7 @@ ResultsShown = false;
 
 function onEndSong()
     ResultScreenTrigger = ResultScreenTrigger or not getModSetting("OVSResults-trigger");
-    local inTheMiddleOfStory =  getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1 and isStoryMode;
+    local inTheMiddleOfStory = getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1 and isStoryMode;
     if RunningUMM or inTheMiddleOfStory or not ResultScreenTrigger then
         return Function_Continue;
     end
@@ -109,6 +111,8 @@ RatingFinalOffsetX = 0;
 RatingMinMaxAngle = {-10, 10};
 ---@type number
 RatingFinalAngle = 0;
+---@type number
+AvgRatingStoryMode = 0;
 
 function onCustomSubstateCreate(name)
     if name == "ResultScreen" then
@@ -117,6 +121,28 @@ function onCustomSubstateCreate(name)
         math.randomseed(os.clock());
         RatingFinalOffsetX = math.random(RatingMinMaxOffsetX[1], RatingMinMaxOffsetX[2]);
         RatingFinalAngle = math.random(RatingMinMaxAngle[1], RatingMinMaxAngle[2]);
+
+        if isStoryMode then
+            runHaxeCode([[
+                var leWeek:WeekData = WeekData.getCurrentWeek();
+                var sumRatings:Float = 0;
+                var countSongs:Float = 0;
+                // game.addTextToDebug(leWeek.songs.map(function(song) {return song[0];}), FlxColor.WHITE);
+                for (song in leWeek.songs) {
+                    var songPercent = Highscore.getRating(song[0], PlayState.storyDifficulty);
+                    if (countSongs == leWeek.songs.length-1) {
+                        songPercent = game.ratingPercent > songPercent ? game.ratingPercent : songPercent;
+                    }
+                    // game.addTextToDebug(songPercent, FlxColor.WHITE);
+                    sumRatings += songPercent;
+                    countSongs++;
+                }
+                setVar("OVSResults-sumRatings", sumRatings);
+                setVar("OVSResults-countSongs", countSongs);
+            ]]);
+            AvgRatingStoryMode = getVar("OVSResults-sumRatings") / getVar("OVSResults-countSongs");
+            -- debugPrint(AvgRatingStoryMode);
+        end
 
         makeLuaSprite('ResultFadeTransition', "", 0, 0);
         makeGraphic('ResultFadeTransition', screenWidth, screenHeight, "000000");
@@ -178,6 +204,9 @@ function onCustomSubstateUpdate(name, elapsed)
     end
 
     if CountingAcc then
+
+        local rating = (isStoryMode and AvgRatingStoryMode or rating);
+
         if ResultScreenDebug then
             if getPropertyFromClass('flixel.FlxG', 'keys.justPressed.SPACE') then
                 triggerRankAnimation();
@@ -467,9 +496,9 @@ function countStats(elapsed)
 
     math.randomseed(os.clock());
 
-    local score = (UseDummy and ScoreDummy or (isStoryMode and getProperty("campaignScore") or score));
+    local score = (UseDummy and ScoreDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignScore") or score));
     local Topcombo = (UseDummy and TopComboDummy or Topcombo);
-    local misses = (UseDummy and MissesDummy or (isStoryMode and getProperty("campaignMisses") or misses));
+    local misses = (UseDummy and MissesDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignMisses") or misses));
 
     local curScoreStr = getNumberTextString('ResultScoreText');
     curScoreStr = (curScoreStr == "" and "0" or curScoreStr);
