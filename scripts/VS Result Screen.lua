@@ -56,7 +56,8 @@ ResultsShown = false;
 function onEndSong()
     ResultScreenTrigger = ResultScreenTrigger or not getModSetting("OVSResults-trigger");
     local inTheMiddleOfStory = getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1 and isStoryMode;
-    if RunningUMM or inTheMiddleOfStory or not ResultScreenTrigger then
+    local freeplayOnly = getModSetting("OVSResults-freeplay") and isStoryMode;
+    if RunningUMM or inTheMiddleOfStory or not ResultScreenTrigger or freeplayOnly then
         return Function_Continue;
     end
     local substateName = "";
@@ -496,9 +497,9 @@ function countStats(elapsed)
 
     math.randomseed(os.clock());
 
-    local score = (UseDummy and ScoreDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignScore") or score));
+    local score = (UseDummy and ScoreDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignScore") + score or score));
     local Topcombo = (UseDummy and TopComboDummy or Topcombo);
-    local misses = (UseDummy and MissesDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignMisses") or misses));
+    local misses = (UseDummy and MissesDummy or (isStoryMode and getPropertyFromClass("states.PlayState", "campaignMisses") + misses or misses));
 
     local curScoreStr = getNumberTextString('ResultScoreText');
     curScoreStr = (curScoreStr == "" and "0" or curScoreStr);
