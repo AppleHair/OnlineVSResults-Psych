@@ -1,5 +1,4 @@
 write the README
-replace pack icon
 get the repo ready and stuff
 make sure the Hank challenge port is also ready
 release the mod on GameBanana
