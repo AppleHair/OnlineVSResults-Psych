@@ -19,8 +19,8 @@ If you want, you can also hold the `space` key or any of the note keys to speed 
 * `Signal-Add Unlocked Screen` - Lets a mod add its own unlock screen after the result screen is over. The mod should create two lua sprites and pass their tags through this event. Should be called with `triggerEvent` before the `onEndSong` callback.
     * Value 1 - The tag of the main lua sprite, which will appear in the middle of the screen. If the tag is invalid, the unlock screen will not appear.
     * Value 2 - The tag of the secondary sprite, which will appear in the bottom-right corner of the screen after the main sprite gets to the middle of the screen. If the tag is invalid, only the main sprite will appear and will be covered in black until it gets to the middle of the screen.
-    > [!TIP]
-    > If the sprites don't end up appearing were you wanted them to appear on the screen, you can adjust the `offset.x` and `offset.y` values of the sprites before they are used in the unlock screen to move them relative to the position on the screen where they ended up.
+> [!TIP]
+> If the sprites don't end up appearing were you wanted them to appear on the screen, you can adjust the `offset.x` and `offset.y` values of the sprites before they are used in the unlock screen to move them relative to the position on the screen where they ended up.
 * `Signal-Set Unlocked Screen Color` - Lets you set the background color of the unlock screen using a HEX color code. Should be called with `triggerEvent` before the `onEndSong` callback.
     * Value 1 - The HEX color code of the background color of the unlock screen. The format should be either `#RRGGBB` or `0xRRGGBB`.
     * Value 2 - Ignored.
