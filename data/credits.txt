@@ -1,4 +1,4 @@
 VS Result Screen Credits
 The Blue Hatted::bluehat::Original Programmer & Additional Assets::https://www.youtube.com/channel/UCmzU_ew--CfMqy6NJnNXAkg::0xFF4962d4
-FifLeo::leo::Additional Assets::https://twitter.com/fif_leo15::0xFF43a214
-AppleHair::apple::Psych Engine Porter::https://github.com/AppleHair::0xFF31af8b
+FifLeo::leo::Lead Artist::https://twitter.com/fif_leo15::0xFF43a214
+AppleHair::apple::Psych Engine Port Coder::https://github.com/AppleHair::0xFF31af8b

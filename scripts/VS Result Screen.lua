@@ -31,11 +31,13 @@ UnlockedObjectName = nil;
 UnlockedTitleName = nil;
 ---@type integer
 UnlockedColor = 0x5D3D6F;
+---@type number
+StartCounter = 0;
 
 function onEvent(name, value1, value2)
     if name == "Signal-Add Unlocked Screen" then
         if not luaSpriteExists(value1) then
-            close();
+            return;
         end
 
         UnlockedObjectName = value1;
@@ -47,6 +49,9 @@ function onEvent(name, value1, value2)
         UnlockedColor = FlxColor(value1);
     elseif name == "Signal-Trigger OVS Results" then
         ResultScreenTrigger = true;
+        if value1 ~= nil and value1 ~= "" then
+            StartCounter = tonumber(value1);
+        end
     end
 end
 
@@ -54,6 +59,11 @@ end
 ResultsShown = false;
 
 function onEndSong()
+    if StartCounter > 0 then
+        StartCounter = StartCounter - 1;
+        return Function_Continue;
+    end
+
     ResultScreenTrigger = ResultScreenTrigger or not getModSetting("OVSResults-trigger");
     local inTheMiddleOfStory = getPropertyFromClass("states.PlayState", "storyPlaylist.length") > 1 and isStoryMode;
     local freeplayOnly = getModSetting("OVSResults-freeplay") and isStoryMode;
