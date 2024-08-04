@@ -2,9 +2,9 @@
 
 # ONLINE VS. Result Screen for Psych Engine
 
-This is a psych engine re-creation of the result screen from [ONLINE VS](https://gamebanana.com/mods/286594). You can use it as a mod for psych engine to add the result screen to the game, use the mod's settings to determine when it will appear and use its signals with the `triggerEvent` function to add a custom unlock screen to your mod and make it more compatible with this result screen.
+This is a psych engine re-creation of the result screen from [ONLINE VS](https://gamebanana.com/mods/286594).
 
-If you want, you can also hold the `space` key or any of the note keys to speed up the result screen's animations.
+You can use it as a mod for psych engine to add the result screen to the game, use the mod's settings to determine when it will appear and use its signals with the `triggerEvent` function to add a custom unlock screen to your mod and make it more compatible with this result screen. If you want, you can also hold the `space` key or any of the note keys to speed up the result screen's animations.
 
 # Settings
 
