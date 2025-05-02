@@ -10,6 +10,7 @@ function onCreate()
     addHaxeLibrary("WeekData", "backend");
     addHaxeLibrary("Highscore", "backend");
     addHaxeLibrary("CoolUtil", "backend");
+    addHaxeLibrary("MusicBeatState", "backend");
     addHaxeLibrary("CustomFadeTransition", "backend");
     addHaxeLibrary("FlxGradient", "flixel.util");
     addHaxeLibrary("FlxTrail", "flixel.addons.effects");
@@ -19,7 +20,6 @@ function onCreate()
     addHaxeLibrary("FlxColorTransformUtil", "flixel.util");
     addHaxeLibrary("LuaUtils", "psychlua");
     addHaxeLibrary("FlxSubState", "flixel");
-    addHaxeLibrary("SScript", "tea");
 
     RunningUMM = onlinePlay ~= nil;
     -- onlinePlay = true | false
@@ -43,7 +43,7 @@ function onEvent(name, value1, value2)
         UnlockedObjectName = value1;
         UnlockedTitleName = (luaSpriteExists(value2) and value2 or nil);
         UnlockedColor = runHaxeCode([[
-            return FlxColor.fromInt(CoolUtil.dominantColor(game.modchartSprites.get("]]..value1..[[")));
+            return FlxColor.fromInt(CoolUtil.dominantColor(MusicBeatState.getVariables().get("]]..value1..[[")));
         ]]);
     elseif name == "Signal-Set Unlocked Screen Color" then
         UnlockedColor = FlxColor(value1);
@@ -146,7 +146,7 @@ function onCustomSubstateCreate(name)
                     }
                     // game.addTextToDebug(songPercent, FlxColor.WHITE);
                     sumRatings += songPercent;
-                    countSongs++;
+                    countSongs = countSongs + 1;
                 }
                 setVar("OVSResults-sumRatings", sumRatings);
                 setVar("OVSResults-countSongs", countSongs);
@@ -192,14 +192,14 @@ AccuracyCounter = (ResultScreenDebug and 0 or -10);
 ---@type table
 ResultScreenStates = {
 -- accuracy, rating, BGcolor, pitch, ratingAngle, ratingOffsetX, ratingOffsetY
-    {0, "shit", 0x6A4280, -0.35},-- F
-    {16, "shit", 0x6A4280, -0.35},-- E
-    {32, "bad", 0x6A4280, -0.225},-- D
-    {47, "bad", 0x4648AA, -0.1},-- C
-    {63, "good", 0x4648AA, 0.0},-- B
-    {78, "good", 0xD562E1, 0.15},-- A
-    {94, "sick", 0x7EF2BE, 0.25},-- S
-    {100, "sick", 0x12E2E2, 0.3},-- Ss
+    {0, "shit", 0x6A4280, 0.65},-- F
+    {16, "shit", 0x6A4280, 0.65},-- E
+    {32, "bad", 0x6A4280, 0.775},-- D
+    {47, "bad", 0x4648AA, 0.9},-- C
+    {63, "good", 0x4648AA, 1.0},-- B
+    {78, "good", 0xD562E1, 1.15},-- A
+    {94, "sick", 0x7EF2BE, 1.25},-- S
+    {100, "sick", 0x12E2E2, 1.3},-- Ss
 };
 ---@type integer
 SickGoldColor = 0xfEffA4;
@@ -216,7 +216,7 @@ function onCustomSubstateUpdate(name, elapsed)
 
     if CountingAcc then
 
-        local rating = (isStoryMode and AvgRatingStoryMode or rating);
+        local rating = math.min(1.0, (isStoryMode and AvgRatingStoryMode or rating));
 
         if ResultScreenDebug then
             if getPropertyFromClass('flixel.FlxG', 'keys.justPressed.SPACE') then
@@ -271,11 +271,9 @@ function onCustomSubstateUpdate(name, elapsed)
         getProperty('ResultWhiteGradient.frameWidth') - getVar('ResultWhiteRevealed') - 162);
     if getVar('ResultWhiteRevealed') ~= getProperty('ResultWhiteGradient.clipRect.width') then
         runHaxeCode([[
-            game.modchartSprites.get("ResultWhiteGradient").clipRect = new FlxRect(0,0,]]..
+            MusicBeatState.getVariables().get("ResultWhiteGradient").clipRect = new FlxRect(0,0,]]..
                 getVar('ResultWhiteRevealed')
             ..[[,60);
-            // to prevent memory leaks
-            SScript.global.clear();
         ]]);
     end
 
@@ -353,11 +351,7 @@ function triggerRankAnimation()
         return;
     end
     playSound("confirmMenu", 1, "RankUp");
-    runHaxeCode([[
-        game.modchartSounds["RankUp"].pitch = ]]..1 + ResultScreenStates[ResultStateKey][4]..[[;
-        // to prevent memory leaks
-        SScript.global.clear();
-    ]]);
+    setSoundPitch("RankUp", ResultScreenStates[ResultStateKey][4]);
     if ResultStateKey ~= 8 then
         scaleObject('ResultMainRank', 1.15, 1.15, false);
         ResultFlashTable["ResultMainRank"] = 1;
@@ -391,8 +385,6 @@ function applyResultScreenFlash()
                 sprite.colorTransform.concat(new ColorTransform(-1, -1, -1, 1, 255, 255, 255));
                 sprite.colorTransform.concat(new ColorTransform(]]..1-v..[[, ]]..1-v..[[, ]]..1-v..[[));
                 sprite.colorTransform.concat(new ColorTransform(-1, -1, -1, 1, 255, 255, 255));
-                // to prevent memory leaks
-                SScript.global.clear();
             ]]);
         end
     end
@@ -705,7 +697,7 @@ function SetupResultScreenBG()
     makeLuaSprite('ResultGradientUp', "", 0, 0);
     setObjectCamera('ResultGradientUp', "camOther");
     runHaxeCode([[
-        game.modchartSprites.get("ResultGradientUp").pixels = 
+        MusicBeatState.getVariables().get("ResultGradientUp").pixels = 
             FlxGradient.createGradientBitmapData(1, FlxG.height * 0.3, [FlxColor.BLACK, 0xDB000000,
             0xA0000000, 0x60000000, 0x22000000, FlxColor.TRANSPARENT]);
     ]]);
@@ -716,7 +708,7 @@ function SetupResultScreenBG()
     makeLuaSprite('ResultGradientDown', "", 0, 0);
     setObjectCamera('ResultGradientDown', "camOther");
     runHaxeCode([[
-        game.modchartSprites.get("ResultGradientDown").pixels = 
+        MusicBeatState.getVariables().get("ResultGradientDown").pixels = 
             FlxGradient.createGradientBitmapData(1, FlxG.height * 0.3, [FlxColor.TRANSPARENT, 0x22000000,
             0x60000000, 0xA0000000, 0xDB000000, FlxColor.BLACK]);
     ]]);
@@ -737,7 +729,7 @@ function SetupResultScreen()
     makeLuaSprite('ResultWhiteGradient', "", 0, 0);
     setObjectCamera('ResultWhiteGradient', "camOther");
     runHaxeCode([[
-        game.modchartSprites.get("ResultWhiteGradient").pixels = 
+        MusicBeatState.getVariables().get("ResultWhiteGradient").pixels = 
             FlxGradient.createGradientBitmapData(956, 1, [FlxColor.WHITE, 0xDDFFFFFF,
             0xAAFFFFFF, 0x77FFFFFF, 0x33FFFFFF, 0x00FFFFFF], 1, 180);
     ]]);
@@ -747,7 +739,7 @@ function SetupResultScreen()
     setVar('ResultWhiteRevealed', 0);
     setProperty('ResultWhiteGradient.x', getProperty('ResultWhiteGradient.x') +
         getProperty('ResultWhiteGradient.frameWidth') - getVar('ResultWhiteRevealed') - 162);
-    runHaxeCode('game.modchartSprites.get("ResultWhiteGradient").clipRect = new FlxRect(0,0,'..
+    runHaxeCode('MusicBeatState.getVariables().get("ResultWhiteGradient").clipRect = new FlxRect(0,0,'..
         getVar('ResultWhiteRevealed')
     ..',60);');
 
@@ -830,7 +822,7 @@ function SetupResultScreen()
     addAnimationByPrefix('ResultEnter', 'idle', 'ENTER IDLE', 0, false);
     addAnimationByPrefix('ResultEnter', 'pressed', 'ENTER PRESSED', 12, true);
     playAnim('ResultEnter', 'idle');
-    runHaxeCode('game.modchartSprites.get("ResultEnter").clipRect = new FlxRect(0,0,592,271);');
+    runHaxeCode('MusicBeatState.getVariables().get("ResultEnter").clipRect = new FlxRect(0,0,592,271);');
     setObjectCamera('ResultEnter', "camOther");
     scaleObject('ResultEnter', 0.84, 0.84, false);
     screenCenter('ResultEnter', 'XY');
@@ -904,7 +896,7 @@ function SetupUnlockedScreen()
     -- (It should be a smaller and simpler gradient,
     -- and it should start below the upper black bar)
     runHaxeCode([[
-        game.modchartSprites.get("ResultGradientUp").pixels = 
+        MusicBeatState.getVariables().get("ResultGradientUp").pixels = 
             FlxGradient.createGradientBitmapData(1, FlxG.height * 0.075, [FlxColor.BLACK, FlxColor.TRANSPARENT]);
     ]]);
     setProperty('ResultGradientUp.scale.x', screenWidth);
@@ -915,7 +907,7 @@ function SetupUnlockedScreen()
     -- (It should be a smaller and simpler gradient,
     -- and it should start above the lower black bar)
     runHaxeCode([[
-        game.modchartSprites.get("ResultGradientDown").pixels = 
+        MusicBeatState.getVariables().get("ResultGradientDown").pixels = 
             FlxGradient.createGradientBitmapData(1, FlxG.height * 0.075, [FlxColor.TRANSPARENT, FlxColor.BLACK]);
     ]]);
     setProperty('ResultGradientDown.scale.x', screenWidth);
@@ -973,7 +965,7 @@ function SetupUnlockedScreen()
     -- (Uses FlxTrail from the
     -- flixel.addons.effects package)
     runHaxeCode([[
-        var object:FlxSprite = game.modchartSprites.get("]]..UnlockedObjectName..[[");
+        var object:FlxSprite = MusicBeatState.getVariables().get("]]..UnlockedObjectName..[[");
         var trail:FlxTrail = new FlxTrail(object, null, 6, ]]..
         math.ceil((getPropertyFromClass('backend.ClientPrefs', 'data.framerate') / 60) * 1.25)
         ..[[, 0.25, 0.05);
@@ -1044,7 +1036,7 @@ end
 
 function insertLuaTextToCustomSubstate(tag, pos)
     runHaxeCode([[
-        setVar("TempTextLua", LuaUtils.getTextObject("]]..tag..[["));
+        setVar("TempTextLua", MusicBeatState.getVariables().get("]]..tag..[["));
     ]]);
     insertToCustomSubstate('TempTextLua', pos);
     setVar("TempTextLua", nil);
