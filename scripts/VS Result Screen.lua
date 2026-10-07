@@ -191,7 +191,7 @@ ResultStateKey = 0;
 AccuracyCounter = (ResultScreenDebug and 0 or -10);
 ---@type table
 ResultScreenStates = {
--- accuracy, rating, BGcolor, pitch, ratingAngle, ratingOffsetX, ratingOffsetY
+-- accuracy, rating, BGcolor, pitch
     {0, "shit", 0x6A4280, 0.65},-- F
     {16, "shit", 0x6A4280, 0.65},-- E
     {32, "bad", 0x6A4280, 0.775},-- D
@@ -298,7 +298,7 @@ function onCustomSubstateUpdate(name, elapsed)
         )));
         setProperty('ResultEnter.alpha', lerp(ResultEnterAlphas[1], ResultEnterAlphas[2], enterLerp) * getVar("EnterOpacity"));
 
-        if getPropertyFromClass('flixel.FlxG', 'keys.justPressed.ENTER') then
+        if getPropertyFromClass('flixel.FlxG', 'keys.justPressed.ENTER') or getPropertyFromClass('flixel.FlxG', 'mouse.justPressed') then
             setProperty('ResultEnter.color', 0xFFFFFF);
             setProperty('ResultEnter.alpha', 1.0);
             playAnim('ResultEnter', 'pressed');
@@ -325,7 +325,7 @@ function onCustomSubstateUpdate(name, elapsed)
 
     if (not ResultsShown) and
     (keyPressed('accept') or keyPressed('left') or keyPressed('down') or
-    keyPressed('up') or keyPressed('right')) then
+    keyPressed('up') or keyPressed('right') or getPropertyFromClass('flixel.FlxG', 'mouse.pressed')) then
         NumScrollSpeed = NumScrollSpeed + 2 * elapsed;
     else
         NumScrollSpeed = 1;
@@ -516,7 +516,7 @@ function countStats(elapsed)
         (TopComboCountSpeed^(NumScrollSpeed)) * math.random() * 60 * elapsed);
     local nextMissesCount = math.min(misses, tonumber(curMissesStr) +
         (MissesCountSpeed^(NumScrollSpeed)) * math.random() * 60 * elapsed);
-    
+
     setNumberTextString('ResultScoreText', string.format("%d", math.floor(nextScoreCount)));
     setNumberTextString('ResultTopComboText', string.format("%d", math.floor(nextTopComboCount)));
     setNumberTextString('ResultMissesText', string.format("%d", math.floor(nextMissesCount)));
@@ -665,7 +665,7 @@ function onTweenCompleted(tag)
         else
             setProperty(UnlockedTitleName..'.alpha', 1.0);
         end
-        
+
         runTimer("HideBG", 1.25);
     elseif tag == "BGExit" then
         UnlockedObjectName = nil;
@@ -868,7 +868,7 @@ function SetupUnlockedScreen()
     -- create the background sprites
     -- and add them to the substate
     SetupResultScreenBG();
-    
+
     -- Setup the background image for the unlocked screen
     setProperty('ResultScreenBG.color', UnlockedColor);
     scaleObject('ResultScreenBG', 1.125, 1.125, false);
